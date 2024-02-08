@@ -90,6 +90,10 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     erubi (1.12.0)
+    factory_bot (6.4.5)
+      activesupport (>= 5.0.0)
+    faker (3.2.3)
+      i18n (>= 1.8.11, < 2)
     globalid (1.2.1)
       activesupport (>= 6.1)
     i18n (1.14.1)
@@ -229,6 +233,8 @@ DEPENDENCIES
   capybara
   cssbundling-rails
   debug
+  factory_bot
+  faker
   importmap-rails
   jbuilder
   jsbundling-rails
