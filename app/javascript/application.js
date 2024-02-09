@@ -1,1 +1,1 @@
-import "./components/PlacesList"
+import "./components/App"
