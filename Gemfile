@@ -46,6 +46,7 @@ gem "bootsnap", require: false
 gem "jsbundling-rails"
 
 gem "cssbundling-rails"
+gem "pry"
 
 
 # Use Sass to process CSS

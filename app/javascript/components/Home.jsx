@@ -2,18 +2,12 @@ import React, { useState } from 'react'
 import axios from "axios"
 import { Link, useNavigate } from 'react-router-dom'
 
-export default function Home() {
-
-    return (
-        <Login />
-    )
-}
 
 export function Login(props) {
     const navigate = useNavigate()
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [loginErrors, setLoginErrors] = useState('');
+    const [loginErrors, setLoginErrors] = useState(false);
 
     const redirectLogin = (data) => {
         props.handleSuccessfulAuth(data)
@@ -46,6 +40,8 @@ export function Login(props) {
             }).then(response => {
                 if (response.data.logged_in)
                     redirectLogin(response.data)
+                else if(response.data.status == 401)
+                    setLoginErrors(true)
             }).catch(error => console.log('login error', error))
         e.preventDefault()
     }
@@ -89,9 +85,10 @@ export function Login(props) {
 
                         </div>
                         <button type="submit" onSubmit={handleSubmit} className="block w-full bg-indigo-600 mt-5 py-2 rounded-2xl hover:bg-indigo-700 hover:-translate-y-1 transition-all duration-500 text-white font-semibold mb-2">Login</button>
+                        {loginErrors && <p className="text-sm font-normal text-red-600 mb-8">Invalid Account</p>}
+                        
                         <div className="flex justify-between mt-4">
                             {/* <span className="text-sm ml-2 hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all">Forgot Password ?</span> */}
-
                             <Link to="/" className="text-sm ml-2 hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all">Don't have an account yet?</Link>
                         </div>
                     </form>
@@ -104,7 +101,6 @@ export function Login(props) {
 export function Register(props) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [passwordConfirmation, setPasswordConfirmation] = useState('');
     const [registrationErrors, setRegistrationErrors] = useState('');
 
     const handleChange = (e) => {
@@ -116,11 +112,6 @@ export function Register(props) {
             case "password":
                 setPassword(value);
                 break;
-            case "passwordConfirmation":
-                setPasswordConfirmation(value);
-                break;
-            default:
-                break;
         }
     };
 
@@ -129,12 +120,13 @@ export function Register(props) {
             user: {
                 email: email,
                 password: password,
-                passwordConfirmation: passwordConfirmation
             }
         }, { withCredentials: true })
             .then(response => {
                 if (response.data.status === 'created')
                     props.handleSuccessfulAuth(response.data)
+                    else if(response.data.status == 401)
+                        setRegistrationErrors(true)
             }).catch(error => console.log('login error', error))
         e.preventDefault()
     }
@@ -174,12 +166,8 @@ export function Register(props) {
                             </svg>
                             <input className="pl-2 w-full outline-none border-none" type="password" name="password" id="password" placeholder="Password" onChange={handleChange} />
                         </div>
-                        <div className="flex items-center border-2 mb-12 py-2 px-3 rounded-2xl ">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                            </svg>
-                            <input className="pl-2 w-full outline-none border-none" type="password" name="passwordConfirmation" id="passwordConfirmation" placeholder="Password Confirmation" onChange={handleChange} />
-                        </div>
+                        {registrationErrors && <p className="text-sm font-normal text-red-600 mb-8">Failed To Create Account, Please Try Again</p>}
+
                         <button type="submit" className="block w-full bg-indigo-600 mt-5 py-2 rounded-2xl hover:bg-indigo-700 hover:-translate-y-1 transition-all duration-500 text-white font-semibold mb-2">Register</button>
                         <div className="flex justify-between mt-4">
                             <Link to="/login" className="text-sm ml-2 hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all">Already have an account?</Link>

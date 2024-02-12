@@ -54,7 +54,6 @@ export default function PlacesList() {
     fetch(apiEndpoint)
       .then(response => response.json())
       .then(data => {
-        console.log(data)
         setLoadedPlaces(data["places"])
         setLoading(false)
       });

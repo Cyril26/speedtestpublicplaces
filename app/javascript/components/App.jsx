@@ -9,7 +9,8 @@ import axios from "axios"
 
 import NewInternetSpeed from "./NewInternetSpeed"
 import PlacesList from "./PlacesList"
-import Home, {Login, Register} from "./Home"
+import {Login, Register} from "./Home"
+import Navbar from './Navbar';
 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
                 setLoggedInStatus('NOT_LOGGED_IN')
                 setUser({})
             }
+            console.log(response.data)
         }).catch(error => {
             console.log("check login error", error)
         })
@@ -48,19 +50,25 @@ function App() {
 
     useEffect(() => {
         checkLoginStatus()
-    }, [])
+    }, [loggedInStatus])
+
+    const loggedIn = loggedInStatus === "LOGGED_IN"
+
 
     return (
+        <>
+        <Navbar loggedInStatus={loggedInStatus} handleLogout={handleLogout}/>
         <BrowserRouter>
             <div>
                 <Routes>
-                    <Route path='/' element={<Home handleLogin={handleLogin} handleLogout={handleLogout} loggedInStatus={loggedInStatus} handleSuccessfulAuth={handleSuccessfulAuth} />} />
+                    <Route path='/' element={<Register handleLogin={handleLogin} handleLogout={handleLogout} loggedInStatus={loggedInStatus} handleSuccessfulAuth={handleSuccessfulAuth} />} />
                     <Route path='/login' element={<Login handleLogin={handleLogin} handleLogout={handleLogout} loggedInStatus={loggedInStatus} handleSuccessfulAuth={handleSuccessfulAuth}/>} />
-                    <Route path="/places" element={loggedInStatus && <PlacesList />} />
-                    <Route path="/new-internet-speed" element={<NewInternetSpeed />} />
+                    <Route path="/places" element={loggedIn && <PlacesList />} />
+                    <Route path="/new-internet-speed" element={loggedIn && <NewInternetSpeed />} />
                 </Routes>
             </div>
         </BrowserRouter>
+        </>
     )
 }
 
