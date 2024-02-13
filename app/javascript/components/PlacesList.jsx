@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Login } from "./Home";
 
 function renderPlacesPage(body, onSearchTextChange) {
   return (
@@ -37,19 +38,18 @@ function renderPlacesPage(body, onSearchTextChange) {
   )
 }
 
-export default function PlacesList() {
-  // State as: A minimum set of parameters that fully represents
-  // what you want to render on the screen.
-  // showLoading: Boolean
-  // loadedPlaces: [] => gets filled
+export default function PlacesList({user}) {
   const [loading, setLoading] = useState(true)
   const [loadedPlaces, setLoadedPlaces] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [sortColumn, setSortColumn] = useState("name")
   const [sortOrder, setSortOrder] = useState("asc")
+  const navigate = useNavigate()
 
   useEffect(() => {
-    // Hit the server and get the places list.
+    if (!user) {
+      return navigate('/')
+    }
     const apiEndpoint = `/api/places?search_term=${searchTerm}&sort_column=${sortColumn}&sort_order=${sortOrder}`
     fetch(apiEndpoint)
       .then(response => response.json())
@@ -65,9 +65,7 @@ export default function PlacesList() {
   }
 
   const handleHeaderClick = (clickedSortColumn) => {
-    // If I was already sorted by name, and I click name again, then I toggle the sortOrder (asc <=> desc)
     if (clickedSortColumn == sortColumn) {
-      // Toggle the sort Order and you're done
       setSortOrder(sortOrder == "asc" ? "desc" : "asc")
     } else {
       setSortColumn(clickedSortColumn)

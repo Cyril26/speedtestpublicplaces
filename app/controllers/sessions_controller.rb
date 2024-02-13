@@ -1,39 +1,28 @@
 class SessionsController < ApplicationController
-  include CurrentUserConcern
+  skip_before_action :verify_authenticity_token, only: [:create, :logout]
 
-    def create
-      user = User
-              .find_by(email: params["user"]["email"])
-              .try(:authenticate, params["user"]["password"])
+  def create
+    @user = User.find_by(email: params["user"]["email"])
 
-      if user
-        session[:user_id] = user.id
-        render json: {
-          status: :created,
-          logged_in: true,
-          user: user
-        }
-      else
-        render json: { status: 401 }
-      end
-    end
-
-    def logged_in
-      if @current_user
-        render json: {
-          logged_in: true,
-          user: @current_user
-        }
-      else
-        render json: {
-          logged_in: false
-        }
-      end
-    end
-
-    def logout
-      session[:user_id] = nil
-      @current_user = nil
-      render json: { status: 200, logged_in: false}
+    if @user.present? && @user&.authenticate(params["user"]["password"])
+      session[:user_id] = @user.id
+      render json: { status: :ok, user: @user }
+    else
+      render json: { errors: ["Invalid username or password"], status: :unauthorized }
     end
   end
+
+  def logged_in
+    if @current_user
+      render json: @current_user, status: :ok
+    else
+      render json: { message: "No user logged in" }, status: :unauthorized
+    end
+  end
+
+  def logout
+    session.delete :user_id
+    head :no_content
+    @current_user = nil
+  end
+end

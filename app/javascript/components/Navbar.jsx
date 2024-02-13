@@ -1,16 +1,19 @@
 import React from 'react'
 import axios from "axios"
 
-export default function Navbar({ loggedInStatus, handleLogout }) {
+export default function Navbar({ user, handleLogout }) {
 
     const handleLogoutClick = () => {
-        axios.delete("http://localhost:9000/logout", {
+        axios.delete("http://127.0.0.1:9000/logout", {
            withCredentials: true
-        }).then(()=>handleLogout())
+        }).then(()=>{
+            handleLogout()
+        })
            .catch(error => console.log("logout error", error))
      }
 
-    const loggedIn = loggedInStatus === "LOGGED_IN"
+    const loggedIn = user ?? null
+
     return (
         <nav className="flex items-center bg-gray-800 p-3 flex-wrap">
             <a href="#" className="p-2 mr-4 inline-flex items-center">

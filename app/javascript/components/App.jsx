@@ -11,38 +11,33 @@ import NewInternetSpeed from "./NewInternetSpeed"
 import PlacesList from "./PlacesList"
 import {Login, Register} from "./Home"
 import Navbar from './Navbar';
+import { ProtectedRoute } from './ProtectedRoute';
 
 
 function App() {
-    const [loggedInStatus, setLoggedInStatus] = useState('NOT_LOGGED_IN')
-    const [user, setUser] = useState({})
-
-    const handleSuccessfulAuth = (data) => {
-        handleLogin(data.user)
-    }
+    const [user, setUser] = useState(null)
+    const [loginStatus, setLoginStatus] = useState(false)
 
     const handleLogin = (data) => {
-        setLoggedInStatus('LOGGED_IN')
         setUser(data)
+        if (data.status == "ok") {
+            setLoginStatus(true)
+        }
     }
 
     const handleLogout = () => {
-        setLoggedInStatus("NOT_LOGGED_IN")
-        setUser({})
+        setUser(null)
+        setLoginStatus(false)
     }
 
     const checkLoginStatus = () => {
         axios.get('http://127.0.0.1:9000/logged_in', {
             withCredentials: true
         }).then(response => {
-            if (response.data.logged_in && loggedInStatus === 'NOT_LOGGED_IN') {
-                setLoggedInStatus('LOGGED_IN')
-                setUser(response.data.user)
-            } else if (!response.data.logged_in && loggedInStatus === "LOGGED_IN") {
-                setLoggedInStatus('NOT_LOGGED_IN')
-                setUser({})
+            if (response.status == 200) {
+                setUser(response.data)
+                setLoginStatus(true)
             }
-            console.log(response.data)
         }).catch(error => {
             console.log("check login error", error)
         })
@@ -50,21 +45,21 @@ function App() {
 
     useEffect(() => {
         checkLoginStatus()
-    }, [loggedInStatus])
-
-    const loggedIn = loggedInStatus === "LOGGED_IN"
+    }, [loginStatus])
 
 
     return (
         <>
-        <Navbar loggedInStatus={loggedInStatus} handleLogout={handleLogout}/>
+        <Navbar user={user} handleLogout={handleLogout}/>
         <BrowserRouter>
             <div>
                 <Routes>
-                    <Route path='/' element={<Register handleLogin={handleLogin} handleLogout={handleLogout} loggedInStatus={loggedInStatus} handleSuccessfulAuth={handleSuccessfulAuth} />} />
-                    <Route path='/login' element={<Login handleLogin={handleLogin} handleLogout={handleLogout} loggedInStatus={loggedInStatus} handleSuccessfulAuth={handleSuccessfulAuth}/>} />
-                    <Route path="/places" element={loggedIn && <PlacesList />} />
-                    <Route path="/new-internet-speed" element={loggedIn && <NewInternetSpeed />} />
+                    <Route path='/' element={<Login handleLogin={handleLogin} handleLogout={handleLogout} />} />
+                    <Route path='/register' element={<Register handleLogin={handleLogin} handleLogout={handleLogout} />} />
+                    <Route element={<ProtectedRoute loginStatus={loginStatus}/>}>
+                        <Route path="/places" element={user && <PlacesList user={user} />} />
+                        <Route path="/new-internet-speed" element={user && <NewInternetSpeed />} />
+                    </Route>
                 </Routes>
             </div>
         </BrowserRouter>
