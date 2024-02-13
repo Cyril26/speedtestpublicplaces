@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Login } from "./Home";
+import { useAuth } from "./AuthProvider";
 
 function renderPlacesPage(body, onSearchTextChange) {
   return (
@@ -38,18 +38,14 @@ function renderPlacesPage(body, onSearchTextChange) {
   )
 }
 
-export default function PlacesList({user}) {
+export default function PlacesList() {
   const [loading, setLoading] = useState(true)
   const [loadedPlaces, setLoadedPlaces] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [sortColumn, setSortColumn] = useState("name")
   const [sortOrder, setSortOrder] = useState("asc")
-  const navigate = useNavigate()
 
   useEffect(() => {
-    if (!user) {
-      return navigate('/')
-    }
     const apiEndpoint = `/api/places?search_term=${searchTerm}&sort_column=${sortColumn}&sort_order=${sortOrder}`
     fetch(apiEndpoint)
       .then(response => response.json())

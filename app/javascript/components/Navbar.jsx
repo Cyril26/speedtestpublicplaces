@@ -1,18 +1,21 @@
 import React from 'react'
 import axios from "axios"
+import { useAuth } from './AuthProvider'
+import { useNavigate } from 'react-router-dom'
 
-export default function Navbar({ user, handleLogout }) {
+
+export default function Navbar() {
+    const { user, handleLogout } = useAuth()
+    const navigate = useNavigate()
 
     const handleLogoutClick = () => {
         axios.delete("http://127.0.0.1:9000/logout", {
-           withCredentials: true
-        }).then(()=>{
+            withCredentials: true
+        }).then(() => {
             handleLogout()
-        })
-           .catch(error => console.log("logout error", error))
-     }
-
-    const loggedIn = user ?? null
+            navigate("/")
+        }).catch(error => console.log("logout error", error))
+    }
 
     return (
         <nav className="flex items-center bg-gray-800 p-3 flex-wrap">
@@ -29,12 +32,16 @@ export default function Navbar({ user, handleLogout }) {
                 <span className="text-xl text-white font-bold uppercase tracking-wide"
                 >Public Places</span>
             </a>
-            <button
-                className="text-white inline-flex p-3 hover:bg-gray-900 rounded lg:hidden ml-auto hover:text-white outline-none nav-toggler"
-                data-target="#navigation"
-            >
-                <i className="material-icons">menu</i>
-            </button>
+            {
+                user &&
+                    <button
+                        className="text-white inline-flex p-3 hover:bg-gray-900 rounded lg:hidden ml-auto hover:text-white outline-none nav-toggler"
+                        data-target="#navigation"
+                        onClick={() => handleLogoutClick()}
+                    >
+                        Logout
+                    </button>
+            }
             <div
                 className="hidden top-navbar w-full lg:inline-flex lg:flex-grow lg:w-auto"
                 id="navigation"
@@ -45,7 +52,7 @@ export default function Navbar({ user, handleLogout }) {
                     <div
                         className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
                     >
-                       {loggedIn && <button onClick={()=>handleLogoutClick()}>{loggedIn ? "Logout" : "Login"}</button>}
+                        {user && <button onClick={() => handleLogoutClick()}>Logout</button>}
                     </div>
                 </div>
             </div>

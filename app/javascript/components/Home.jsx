@@ -1,16 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from "axios"
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from './AuthProvider'
 
 
-export function Login(props) {
+export function Login() {
+    const { user, handleLogin, checkLoginStatus, loginStatus} = useAuth()
+
     const navigate = useNavigate()
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loginErrors, setLoginErrors] = useState(false);
 
     const redirectToPlaces = (data) => {
-        props.handleLogin(data)
+        handleLogin(data)
         navigate('/places')
     }
 
@@ -43,7 +46,6 @@ export function Login(props) {
             {
                 withCredentials: true
             }).then(response => {
-                console.log(response)
                 if (response.status == 200)
                     redirectToPlaces(response.data)
                 else 
@@ -51,24 +53,23 @@ export function Login(props) {
             }).catch(error => console.log('login error', error))
     }
 
+    useEffect(() => {
+        const navigateIfNotLoggedIn = async () => {
+            await checkLoginStatus();
+            if (user) {
+                navigate("/places");
+            }
+        };
+    
+        navigateIfNotLoggedIn();
+    }, [loginStatus]);
+
+
     return (
         <div className="h-screen flex">
             <div className="hidden lg:flex w-full lg:w-1/2 login_img_section justify-around items-center">
-                <div
-                    className=" 
-                    bg-black 
-                    opacity-20 
-                    inset-0 
-                    z-0"
-                >
-
-                </div>
                 <div className="w-full mx-auto px-20 flex-col items-center space-y-6">
-                    <h1 className="text-white font-bold text-4xl font-sans">Simple App</h1>
-                    <p className="text-white mt-1">The simplest app to use</p>
-                    <div className="flex justify-center lg:justify-start mt-6">
-                        <a href="#" className="hover:bg-indigo-700 hover:text-white hover:-translate-y-1 transition-all duration-500 bg-white text-indigo-800 mt-4 px-4 py-2 rounded-2xl font-bold mb-2">Get Started</a>
-                    </div>
+                    <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="places" />
                 </div>
             </div>
             <div className="flex w-full lg:w-1/2 justify-center items-center bg-white space-y-8">
@@ -102,7 +103,9 @@ export function Login(props) {
     )
 }
 
-export function Register(props) {
+export function Register() {
+    const { handleLogin } = useAuth()
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [registrationErrors, setRegistrationErrors] = useState('');
@@ -135,7 +138,7 @@ export function Register(props) {
             .then(response => {
                 if (response.data.status === 'created')
                 {
-                    props.handleLogin(response.data)
+                    handleLogin(response.data)
                     navigate("/")
                 }
                     else
@@ -144,22 +147,9 @@ export function Register(props) {
     }
     return (
         <div className="h-screen flex">
-            <div className="hidden lg:flex w-full lg:w-1/2 login_img_section justify-around items-center">
-                <div
-                    className=" 
-                    bg-black 
-                    opacity-20 
-                    inset-0 
-                    z-0"
-                >
-
-                </div>
+            <div className="hidden lg:flex w-full lg:w-1/2 justify-around items-center">
                 <div className="w-full mx-auto px-20 flex-col items-center space-y-6">
-                    <h1 className="text-white font-bold text-4xl font-sans">Simple App</h1>
-                    <p className="text-white mt-1">The simplest app to use</p>
-                    <div className="flex justify-center lg:justify-start mt-6">
-                        <a href="#" className="hover:bg-indigo-700 hover:text-white hover:-translate-y-1 transition-all duration-500 bg-white text-indigo-800 mt-4 px-4 py-2 rounded-2xl font-bold mb-2">Get Started</a>
-                    </div>
+                    <img src="https://images.unsplash.com/photo-1559925393-8be0ec4767c8?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="places" />
                 </div>
             </div>
             <div className="flex w-full lg:w-1/2 justify-center items-center bg-white space-y-8">

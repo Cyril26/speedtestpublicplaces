@@ -13,7 +13,7 @@ class SessionsController < ApplicationController
   end
 
   def logged_in
-    if @current_user
+    if current_user
       render json: @current_user, status: :ok
     else
       render json: { message: "No user logged in" }, status: :unauthorized

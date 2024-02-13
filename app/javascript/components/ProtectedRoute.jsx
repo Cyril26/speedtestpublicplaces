@@ -1,18 +1,27 @@
 import React, {useEffect} from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
+import Navbar from './Navbar'
+import { useAuth } from './AuthProvider'
 
-export const ProtectedRoute = ({ loginStatus }) => {
+export const ProtectedRoute = () => {
+    const { loginStatus, checkLoginStatus } = useAuth()
     const navigate = useNavigate()
 
-    console.log(loginStatus)
-
     useEffect(() => {
-        if (!loginStatus)
-            navigate("/")
-    }, [loginStatus])
+        const navigateIfNotLoggedIn = async () => {
+            await checkLoginStatus();
+            if (!loginStatus)
+                navigate("/")
+        }
+
+        navigateIfNotLoggedIn();
+    }, [])
 
 
     return (
-        <Outlet />
+        <>
+            <Navbar />
+            <Outlet />
+        </>
     )
 }

@@ -10,4 +10,6 @@ Rails.application.routes.draw do
 
   get "*path", to: "react#home"
   root "react#home"
+
+  get '/images/:filename', to: 'images#show', constraints: { filename: /.+/ }
 end
